@@ -6,7 +6,24 @@
 #
 # all_vowel_pairs(["goat", "action", "tear", "impromptu", "tired", "europe"])   # => ["action europe", "tear impromptu"]
 def all_vowel_pairs(words)
+    vowels = 'aeiou'.split('')
+    ans = []
 
+    words.each do |word1|
+        words.each do |word2|
+            if word1 != word2 && ans.include?(word2 + ' ' + word1) == false
+                bigWord = word1 + ' ' + word2
+                hashChar = Hash.new(0)
+                bigWord.each_char do |char|
+                    hashChar[char] += 1
+                end
+                if vowels.all? {|char| hashChar[char] >= 1}
+                    ans << bigWord
+                end
+            end
+        end
+    end
+    return ans
 end
 
 
@@ -18,7 +35,8 @@ end
 # composite?(9)     # => true
 # composite?(13)    # => false
 def composite?(num)
-
+    nums = (2...num).to_a
+    nums.any? {|check| num % check == 0}
 end
 
 
@@ -32,7 +50,20 @@ end
 # find_bigrams("the theater is empty", ["cy", "em", "ty", "ea", "oo"])  # => ["em", "ty", "ea"]
 # find_bigrams("to the moon and back", ["ck", "oo", "ha", "at"])        # => ["ck", "oo"]
 def find_bigrams(str, bigrams)
+    ans = []
+    splitString = str.split('')
 
+    bigrams.each do |bigram|
+        i = 0
+        while i < splitString.length - 1 do
+            if bigram == splitString[i] + splitString[i+1]
+                ans << splitString[i] + splitString[i+1]
+            end
+            i += 1
+        end
+    end
+
+    return ans
 end
 
 class Hash
@@ -50,7 +81,14 @@ class Hash
     # hash_2.my_select { |k, v| k + 1 == v }      # => {10=>11, 5=>6, 7=>8})
     # hash_2.my_select                            # => {4=>4}
     def my_select(&prc)
-
+        ans = Hash.new
+        prc ||= Proc.new { |k, v| k == v }
+        self.each do |k, v|
+            if prc.call(k, v) == true
+                ans[k] = v
+            end
+        end
+        return ans
     end
 end
 
@@ -64,7 +102,24 @@ class String
     # "cats".substrings     # => ["c", "ca", "cat", "cats", "a", "at", "ats", "t", "ts", "s"]
     # "cats".substrings(2)  # => ["ca", "at", "ts"]
     def substrings(length = nil)
-
+        arr = self.split('')
+        subs = []
+        i = 0
+        while i < arr.length do
+            k = i
+            while k < arr.length do
+                subs << arr[i..k].join('')
+                k += 1
+            end
+            i += 1
+        end
+        if length == nil
+            return subs
+        else
+            return subs.select do |ele|
+                ele.length == length
+            end
+        end
     end
 
 
@@ -78,6 +133,11 @@ class String
     # "bootcamp".caesar_cipher(2) #=> "dqqvecor"
     # "zebra".caesar_cipher(4)    #=> "difve"
     def caesar_cipher(num)
-
+        alphabet = 'abcdefghijklmnopqrstuvwxyz'
+        ans = ''
+        self.each_char.with_index do |char, i|
+            ans += alphabet[(alphabet.index(char) + num) % 26]
+        end
+        return ans
     end
 end
